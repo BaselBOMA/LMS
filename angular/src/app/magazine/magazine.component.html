@@ -1,30 +1,150 @@
 <div class="card">
-    <div class="card-header">
-      <div class="row">
-        <div class="col col-md-6">
-          <h5 class="card-title">
-            {{ '::Menu:Magazines' | abpLocalization }}
-          </h5>
-        </div>
-        <div class="text-end col col-md-6"></div>
+  <div class="card-header">
+    <div class="row">
+      <div class="col col-md-6">
+        <h5 class="card-title">
+          {{ '::Menu:Magazines' | abpLocalization }}
+        </h5>
+      </div>
+      <div class="text-end col col-md-6"></div>
+      <div class="text-lg-end pt-2">
+        <button id="create" class="btn btn-primary" type="button" (click)="createMagazine()">
+          <i class="fa fa-plus me-1"></i>
+          <span>{{ '::NewMagazine' | abpLocalization }}</span>
+        </button>
       </div>
     </div>
-    <div class="card-body">
-      <ngx-datatable [rows]="magazine.items" [count]="magazine.totalCount" [list]="list" default>
-        <ngx-datatable-column [name]="'::Title' | abpLocalization" prop="title"></ngx-datatable-column>
-        <ngx-datatable-column [name]="'::Type' | abpLocalization" prop="type">
-          <ng-template let-row="row" ngx-datatable-cell-template>
-            {{ '::Enum:LibraryItemType.' + row.type | abpLocalization }}
-          </ng-template>
-        </ngx-datatable-column>
-        <ngx-datatable-column [name]="'::PublicationDate' | abpLocalization" prop="publicationDate">
-          <ng-template let-row="row" ngx-datatable-cell-template>
-            {{ row.publicationDate | date }}
-          </ng-template>
-        </ngx-datatable-column>
-        <ngx-datatable-column [name]="'::Issn' | abpLocalization" prop="issn"></ngx-datatable-column>
-        <ngx-datatable-column [name]="'::IssueNumber' | abpLocalization" prop="issueNumber"></ngx-datatable-column>
-      </ngx-datatable>
-    </div>
   </div>
-  
+  <div class="card-body">
+    <ngx-datatable [rows]="magazine.items" [count]="magazine.totalCount" [list]="list" default>
+      <ngx-datatable-column
+        [name]="'::Actions' | abpLocalization"
+        [maxWidth]="150"
+        [sortable]="false"
+      >
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div ngbDropdown container="body" class="d-inline-block">
+            <button
+              class="btn btn-primary btn-sm dropdown-toggle"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              ngbDropdownToggle
+            >
+              <i class="fa fa-cog me-1"></i>{{ '::Actions' | abpLocalization }}
+            </button>
+            <div ngbDropdownMenu>
+              <button ngbDropdownItem (click)="editMagazine(row.id)">
+                {{ '::Edit' | abpLocalization }}
+              </button>
+              <button ngbDropdownItem (click)="delete(row.id)">
+                {{ '::Delete' | abpLocalization }}
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column
+        [name]="'::Title' | abpLocalization"
+        prop="title"
+      ></ngx-datatable-column>
+      <ngx-datatable-column [name]="'::Type' | abpLocalization" prop="type">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ '::Enum:LibraryItemType.' + row.type | abpLocalization }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column [name]="'::PublicationDate' | abpLocalization" prop="publicationDate">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ row.publicationDate | date }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column
+        [name]="'::Publisher' | abpLocalization"
+        prop="publisher"
+      ></ngx-datatable-column>
+      <ngx-datatable-column [name]="'::Issn' | abpLocalization" prop="issn"></ngx-datatable-column>
+      <ngx-datatable-column
+        [name]="'::IssueNumber' | abpLocalization"
+        prop="issueNumber"
+      ></ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+</div>
+
+<abp-modal [(visible)]="isModalOpen">
+  <ng-template #abpHeader>
+    <h3>{{ (selectedMagazine.id ? '::Edit' : '::NewMagazine') | abpLocalization }}</h3>
+  </ng-template>
+
+  <ng-template #abpBody>
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="mt-2">
+        <label for="magazine-title">Title</label><span> * </span>
+        <input
+          type="text"
+          id="magazine-title"
+          class="form-control"
+          formControlName="title"
+          autofocus
+        />
+      </div>
+
+      <div class="mt-2">
+        <label for="magazine-type">Type</label><span> * </span>
+        <select class="form-control" id="magazine-type" formControlName="type">
+          <option [ngValue]="null">Select an item type</option>
+          <option [ngValue]="type.value" *ngFor="let type of libraryItemTypes">
+            {{ '::Enum:LibraryItemType.' + type.value | abpLocalization }}
+          </option>
+        </select>
+      </div>
+
+      <div class="mt-2">
+        <label>Publication date</label><span> * </span>
+        <input
+          #datepicker="ngbDatepicker"
+          class="form-control"
+          name="datepicker"
+          formControlName="publicationDate"
+          ngbDatepicker
+          (click)="datepicker.toggle()"
+        />
+      </div>
+
+      <div class="mt-2">
+        <label for="magazine-publisher">Publisher</label><span> * </span>
+        <input
+          type="text"
+          id="magazine-publisher"
+          class="form-control"
+          formControlName="publisher"
+        />
+      </div>
+
+      <div class="mt-2">
+        <label for="magazine-issn">ISSN</label><span> * </span>
+        <input type="text" id="magazine-issn" class="form-control" formControlName="issn" />
+      </div>
+
+      <div class="mt-2">
+        <label for="magazine-issueNumber">Issue Number</label><span> * </span>
+        <input
+          type="number"
+          id="magazine-issueNumber"
+          class="form-control"
+          formControlName="issueNumber"
+        />
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #abpFooter>
+    <button type="button" class="btn btn-secondary" abpClose>
+      {{ '::Close' | abpLocalization }}
+    </button>
+
+    <button class="btn btn-primary" (click)="save()" [disabled]="form.invalid">
+      <i class="fa fa-check mr-1"></i>
+      {{ '::Save' | abpLocalization }}
+    </button>
+  </ng-template>
+</abp-modal>
