@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LMS.Permissions;
+using System;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
@@ -17,6 +18,10 @@ public class LibraryItemAppService :
     public LibraryItemAppService(IRepository<LibraryItem, Guid> repository)
         : base(repository)
     {
-
+        GetPolicyName = LMSPermissions.LibraryItems.Default;
+        GetListPolicyName = LMSPermissions.LibraryItems.Default;
+        CreatePolicyName = LMSPermissions.LibraryItems.Create;
+        UpdatePolicyName = LMSPermissions.LibraryItems.Edit;
+        DeletePolicyName = LMSPermissions.LibraryItems.Delete;
     }
 }

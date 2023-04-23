@@ -21,6 +21,7 @@ function configureRoutes(routesService: RoutesService) {
         iconClass: 'fas fa-regular fa-book-open',
         order: 2,
         layout: eLayoutType.application,
+        requiredPolicy: 'LMS.LibraryItems',
       },
       {
         path: '/books',
@@ -28,6 +29,7 @@ function configureRoutes(routesService: RoutesService) {
         iconClass: 'fas fa-book',
         order: 3,
         layout: eLayoutType.application,
+        requiredPolicy: 'LMS.LibraryItems',
       },
       {
         path: '/magazines',
@@ -35,6 +37,7 @@ function configureRoutes(routesService: RoutesService) {
         iconClass: 'fas fa-newspaper',
         order: 4,
         layout: eLayoutType.application,
+        requiredPolicy: 'LMS.LibraryItems',
       },
       {
         path: '/dvds',
@@ -42,6 +45,7 @@ function configureRoutes(routesService: RoutesService) {
         iconClass: 'fas fa-light fa-compact-disc',
         order: 5,
         layout: eLayoutType.application,
+        requiredPolicy: 'LMS.LibraryItems',
       },
     ]);
   };

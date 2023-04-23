@@ -33,6 +33,11 @@
     "AreYouSureToDelete": "Are you sure you want to delete this item?",
     "Enum:LibraryItemType.0": "Book",
     "Enum:LibraryItemType.1": "Magazine",
-    "Enum:LibraryItemType.2": "DVD"
+    "Enum:LibraryItemType.2": "DVD",
+    "Permission:LMS": "LMS",
+    "Permission:LibraryItems": "Library Items Management",
+    "Permission:LibraryItems.Create": "Creating new library items",
+    "Permission:LibraryItems.Edit": "Editing the library items",
+    "Permission:LibraryItems.Delete": "Deleting the library items"
   } 
 }

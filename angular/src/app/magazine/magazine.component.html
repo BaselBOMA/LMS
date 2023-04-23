@@ -8,7 +8,13 @@
       </div>
       <div class="text-end col col-md-6"></div>
       <div class="text-lg-end pt-2">
-        <button id="create" class="btn btn-primary" type="button" (click)="createMagazine()">
+        <button
+          *abpPermission="'LMS.LibraryItems.Create'"
+          id="create"
+          class="btn btn-primary"
+          type="button"
+          (click)="createMagazine()"
+        >
           <i class="fa fa-plus me-1"></i>
           <span>{{ '::NewMagazine' | abpLocalization }}</span>
         </button>
@@ -18,6 +24,7 @@
   <div class="card-body">
     <ngx-datatable [rows]="magazine.items" [count]="magazine.totalCount" [list]="list" default>
       <ngx-datatable-column
+        *abpPermission="'LMS.LibraryItems.Edit'"
         [name]="'::Actions' | abpLocalization"
         [maxWidth]="150"
         [sortable]="false"
@@ -33,10 +40,18 @@
               <i class="fa fa-cog me-1"></i>{{ '::Actions' | abpLocalization }}
             </button>
             <div ngbDropdownMenu>
-              <button ngbDropdownItem (click)="editMagazine(row.id)">
+              <button
+                *abpPermission="'LMS.LibraryItems.Edit'"
+                ngbDropdownItem
+                (click)="editMagazine(row.id)"
+              >
                 {{ '::Edit' | abpLocalization }}
               </button>
-              <button ngbDropdownItem (click)="delete(row.id)">
+              <button
+                *abpPermission="'LMS.LibraryItems.Delete'"
+                ngbDropdownItem
+                (click)="delete(row.id)"
+              >
                 {{ '::Delete' | abpLocalization }}
               </button>
             </div>

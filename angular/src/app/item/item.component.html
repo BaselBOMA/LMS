@@ -10,7 +10,7 @@
     </div>
   </div>
   <div class="card-body">
-    <ngx-datatable [rows]="item.items" [count]="item.totalCount" [list]="list" default>
+    <ngx-datatable *abpPermission="'LMS.LibraryItems'" [rows]="item.items" [count]="item.totalCount" [list]="list" default>
       <ngx-datatable-column
         [name]="'::Title' | abpLocalization"
         prop="title"

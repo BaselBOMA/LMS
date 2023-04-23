@@ -4,6 +4,11 @@ public static class LMSPermissions
 {
     public const string GroupName = "LMS";
 
-    //Add your own permission names. Example:
-    //public const string MyPermission1 = GroupName + ".MyPermission1";
+    public static class LibraryItems
+    {
+        public const string Default = GroupName + ".LibraryItems";
+        public const string Create = Default + ".Create";
+        public const string Edit = Default + ".Edit";
+        public const string Delete = Default + ".Delete";
+    }
 }
