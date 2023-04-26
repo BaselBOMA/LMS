@@ -15,6 +15,22 @@ import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 export class MagazineComponent implements OnInit {
   magazine = { items: [], totalCount: 0 } as PagedResultDto<MagazineDto>;
 
+  searchTerm: string = '';
+
+  get filteredItems(): any[] {
+    if (!this.searchTerm) {
+      return this.magazine.items;
+    }
+
+    return this.magazine.items.filter((item: any) => {
+      return (
+        item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1 ||
+        (item.publicationDate &&
+          item.publicationDate.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1)
+      );
+    });
+  }
+
   selectedMagazine = {} as MagazineDto;
 
   form: FormGroup;

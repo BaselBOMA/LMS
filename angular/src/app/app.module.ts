@@ -16,6 +16,7 @@ import { AppComponent } from './app.component';
 import { APP_ROUTE_PROVIDER } from './route.provider';
 import { FeatureManagementModule } from '@abp/ng.feature-management';
 import { AbpOAuthModule } from '@abp/ng.oauth';
+import { TableFilterPipe } from '../app/item/table-filter.pipe';
 
 @NgModule({
   imports: [
@@ -36,7 +37,7 @@ import { AbpOAuthModule } from '@abp/ng.oauth';
     SideMenuLayoutModule.forRoot(),
     FeatureManagementModule.forRoot(),
   ],
-  declarations: [AppComponent],
+  declarations: [AppComponent, TableFilterPipe ],
   providers: [APP_ROUTE_PROVIDER],
   bootstrap: [AppComponent],
 })

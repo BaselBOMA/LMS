@@ -6,11 +6,26 @@
           {{ '::Menu:LibraryItems' | abpLocalization }}
         </h5>
       </div>
-      <div class="text-end col col-md-6"></div>
+      <div class="text-end col col-md-6">
+        <div class="input-group">
+          <input
+            class="form-control search-input"
+            placeholder="Enter Title Or Publication Date"
+            (keyup.enter)="list.get()"
+            [(ngModel)]="searchTerm"
+          />
+        </div>
+      </div>
     </div>
   </div>
   <div class="card-body">
-    <ngx-datatable *abpPermission="'LMS.LibraryItems'" [rows]="item.items" [count]="item.totalCount" [list]="list" default>
+    <ngx-datatable
+      *abpPermission="'LMS.LibraryItems'"
+      [rows]="filteredItems"
+      [count]="item.totalCount"
+      [list]="list"
+      default
+    >
       <ngx-datatable-column
         [name]="'::Title' | abpLocalization"
         prop="title"
@@ -20,7 +35,7 @@
           {{ '::Enum:LibraryItemType.' + row.type | abpLocalization }}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column [name]="'::PublicationDate' | abpLocalization" prop="PublicationDate">
+      <ngx-datatable-column [name]="'::PublicationDate' | abpLocalization" prop="publicationDate">
         <ng-template let-row="row" ngx-datatable-cell-template>
           {{ row.publicationDate | date }}
         </ng-template>

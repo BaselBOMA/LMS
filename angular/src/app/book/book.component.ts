@@ -15,6 +15,23 @@ import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 export class BookComponent implements OnInit {
   book = { items: [], totalCount: 0 } as PagedResultDto<BookDto>;
 
+  searchTerm: string = '';
+
+  get filteredItems(): any[] {
+    if (!this.searchTerm) {
+      return this.book.items;
+    }
+
+    return this.book.items.filter((item: any) => {
+      return (
+        item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1 ||
+        item.author.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1 ||
+        (item.publicationDate &&
+          item.publicationDate.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1)
+      );
+    });
+  }
+
   selectedBook = {} as BookDto;
 
   form: FormGroup;
@@ -53,7 +70,7 @@ export class BookComponent implements OnInit {
   }
 
   delete(id: string) {
-    this.confirmation.warn('::AreYouSureToDelete', '::AreYouSure').subscribe((status) => {
+    this.confirmation.warn('::AreYouSureToDelete', '::AreYouSure').subscribe(status => {
       if (status === Confirmation.Status.confirm) {
         this.bookService.delete(id).subscribe(() => this.list.get());
       }

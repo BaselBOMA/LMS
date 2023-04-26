@@ -15,6 +15,22 @@ import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 export class DvdComponent implements OnInit {
   dvd = { items: [], totalCount: 0 } as PagedResultDto<DvdDto>;
 
+  searchTerm: string = '';
+
+  get filteredItems(): any[] {
+    if (!this.searchTerm) {
+      return this.dvd.items;
+    }
+
+    return this.dvd.items.filter((item: any) => {
+      return (
+        item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1 ||
+        (item.publicationDate &&
+          item.publicationDate.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1)
+      );
+    });
+  }
+
   selectedDvd = {} as DvdDto;
 
   form: FormGroup;
@@ -39,13 +55,13 @@ export class DvdComponent implements OnInit {
   }
 
   createDvd() {
-    this.selectedDvd = {} as DvdDto; 
+    this.selectedDvd = {} as DvdDto;
     this.buildForm();
     this.isModalOpen = true;
   }
 
   editDvd(id: string) {
-    this.dvdService.get(id).subscribe((dvd) => {
+    this.dvdService.get(id).subscribe(dvd => {
       this.selectedDvd = dvd;
       this.buildForm();
       this.isModalOpen = true;
@@ -53,7 +69,7 @@ export class DvdComponent implements OnInit {
   }
 
   delete(id: string) {
-    this.confirmation.warn('::AreYouSureToDelete', '::AreYouSure').subscribe((status) => {
+    this.confirmation.warn('::AreYouSureToDelete', '::AreYouSure').subscribe(status => {
       if (status === Confirmation.Status.confirm) {
         this.dvdService.delete(id).subscribe(() => this.list.get());
       }
@@ -77,8 +93,8 @@ export class DvdComponent implements OnInit {
     }
 
     const request = this.selectedDvd.id
-    ? this.dvdService.update(this.selectedDvd.id, this.form.value)
-    : this.dvdService.create(this.form.value);
+      ? this.dvdService.update(this.selectedDvd.id, this.form.value)
+      : this.dvdService.create(this.form.value);
 
     request.subscribe(() => {
       this.isModalOpen = false;
