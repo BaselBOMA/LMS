@@ -1,10 +1,11 @@
 import { ListService, PagedResultDto } from '@abp/ng.core';
 import { Component, OnInit } from '@angular/core';
 import { MagazineService, MagazineDto } from '@proxy/magazines';
-import { libraryItemTypeOptions } from '@proxy/library-items';
+import { CreateUpdateMagazineDto, LibraryItemType, libraryItemTypeOptions } from '@proxy/library-items';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
+import { libraryItemAvailabilityOptions } from '@proxy/library-items';
 
 @Component({
   selector: 'app-magazine',
@@ -37,6 +38,8 @@ export class MagazineComponent implements OnInit {
 
   libraryItemTypes = libraryItemTypeOptions;
 
+  libraryItemAvailability = libraryItemAvailabilityOptions;
+
   isModalOpen = false;
 
   constructor(
@@ -60,7 +63,41 @@ export class MagazineComponent implements OnInit {
     this.isModalOpen = true;
   }
 
-  editBook(id: string) {
+  notAvailable(id: string) {
+    const magazine = this.magazineService.get(id).subscribe(magazine => {
+      const updatedmagazine: CreateUpdateMagazineDto = {
+        title: magazine.title,
+        issn: magazine.issn,
+        publisher: magazine.publisher,
+        publicationDate: magazine.publicationDate,
+        type: magazine.type,
+        issueNumber: magazine.issueNumber,
+        availability: 1,
+      };
+      this.magazineService.update(id, updatedmagazine).subscribe(() => {
+        window.location.reload();
+      });
+    });
+  }
+
+  Available(id: string) {
+    const magazine = this.magazineService.get(id).subscribe(magazine => {
+      const updatedmagazine: CreateUpdateMagazineDto = {
+        title: magazine.title,
+        issn: magazine.issn,
+        publisher: magazine.publisher,
+        publicationDate: magazine.publicationDate,
+        type: magazine.type,
+        issueNumber: magazine.issueNumber,
+        availability: 0,
+      };
+      this.magazineService.update(id, updatedmagazine).subscribe(() => {
+        window.location.reload();
+      });
+    });
+  }
+
+  editMagazine(id: string) {
     this.magazineService.get(id).subscribe(magazine => {
       this.selectedMagazine = magazine;
       this.buildForm();
@@ -79,11 +116,12 @@ export class MagazineComponent implements OnInit {
   buildForm() {
     this.form = this.fb.group({
       title: ['', Validators.required],
-      type: [null, Validators.required],
       publicationDate: [null, Validators.required],
+      type: [LibraryItemType.Magazine],
       publisher: [null, Validators.required],
       issn: [null, Validators.required],
       issueNumber: [null, Validators.required],
+      availability: [null, Validators.required],
     });
   }
 

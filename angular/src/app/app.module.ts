@@ -17,6 +17,7 @@ import { APP_ROUTE_PROVIDER } from './route.provider';
 import { FeatureManagementModule } from '@abp/ng.feature-management';
 import { AbpOAuthModule } from '@abp/ng.oauth';
 import { TableFilterPipe } from '../app/item/table-filter.pipe';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   imports: [
@@ -28,6 +29,7 @@ import { TableFilterPipe } from '../app/item/table-filter.pipe';
       registerLocaleFn: registerLocale(),
     }),
     AbpOAuthModule.forRoot(),
+    ToastrModule.forRoot(),
     ThemeSharedModule.forRoot(),
     AccountConfigModule.forRoot(),
     IdentityConfigModule.forRoot(),

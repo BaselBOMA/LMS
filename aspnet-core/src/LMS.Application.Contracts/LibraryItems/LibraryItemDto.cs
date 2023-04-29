@@ -12,4 +12,5 @@ public class LibraryItemDto : AuditedEntityDto<Guid>
     public DateTime PublicationDate { get; set; }
 
     public string Publisher { get; set; }
+    public LibraryItemAvailability Availability { get; set; }
 }

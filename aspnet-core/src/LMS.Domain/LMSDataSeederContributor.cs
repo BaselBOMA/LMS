@@ -27,7 +27,8 @@ public class LMSDataSeederContributor
                     Title = "1984",
                     Type = LibraryItemType.Book,
                     PublicationDate = new DateTime(1949, 6, 8),
-                    Publisher = ""
+                    Publisher = "",
+                    Availability = LibraryItemAvailability.Available
                 },
                 autoSave: true
             );
@@ -38,7 +39,8 @@ public class LMSDataSeederContributor
                     Title = "Man of the Year—Fighting Man",
                     Type = LibraryItemType.Magazine,
                     PublicationDate = new DateTime(1951, 1, 1),
-                    Publisher = "Time"
+                    Publisher = "Time",
+                    Availability = LibraryItemAvailability.Reserved
                 },
                 autoSave: true
             );
@@ -49,7 +51,8 @@ public class LMSDataSeederContributor
                     Title = "Man of the Year—Fighting Man",
                     Type = LibraryItemType.Magazine,
                     PublicationDate = new DateTime(1951, 1, 1),
-                    Publisher = "Time"
+                    Publisher = "Time",
+                    Availability = LibraryItemAvailability.CheckedOut
                 },
                 autoSave: true
             );
@@ -60,7 +63,8 @@ public class LMSDataSeederContributor
                     Title = "The Dark Knight",
                     Type = LibraryItemType.Dvd,
                     PublicationDate = new DateTime(2008, 12, 9),
-                    Publisher = "Warner Bros. Pictures"
+                    Publisher = "Warner Bros. Pictures",
+                    Availability = LibraryItemAvailability.NotAvailable
                 },
                 autoSave: true
             );

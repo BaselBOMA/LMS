@@ -1,7 +1,7 @@
 import { ListService, PagedResultDto } from '@abp/ng.core';
 import { Component, OnInit } from '@angular/core';
 import { DvdService, DvdDto } from '@proxy/dvds';
-import { libraryItemTypeOptions } from '@proxy/library-items';
+import { CreateUpdateDvdDto, LibraryItemType, libraryItemAvailabilityOptions, libraryItemTypeOptions } from '@proxy/library-items';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
@@ -37,6 +37,8 @@ export class DvdComponent implements OnInit {
 
   libraryItemTypes = libraryItemTypeOptions;
 
+  libraryItemAvailability = libraryItemAvailabilityOptions;
+
   isModalOpen = false;
 
   constructor(
@@ -60,6 +62,40 @@ export class DvdComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  notAvailable(id: string) {
+    const dvd = this.dvdService.get(id).subscribe(dvd => {
+      const updateddvd: CreateUpdateDvdDto = {
+        title: dvd.title,
+        duration: dvd.duration,
+        publisher: dvd.publisher,
+        publicationDate: dvd.publicationDate,
+        type: dvd.type,
+        language: dvd.language,
+        availability: 1,
+      };
+      this.dvdService.update(id, updateddvd).subscribe(() => {
+        window.location.reload();
+      });
+    });
+  }
+
+  Available(id: string) {
+    const dvd = this.dvdService.get(id).subscribe(dvd => {
+      const updateddvd: CreateUpdateDvdDto = {
+        title: dvd.title,
+        duration: dvd.duration,
+        publisher: dvd.publisher,
+        publicationDate: dvd.publicationDate,
+        type: dvd.type,
+        language: dvd.language,
+        availability: 0,
+      };
+      this.dvdService.update(id, updateddvd).subscribe(() => {
+        window.location.reload();
+      });
+    });
+  }
+
   editDvd(id: string) {
     this.dvdService.get(id).subscribe(dvd => {
       this.selectedDvd = dvd;
@@ -79,11 +115,12 @@ export class DvdComponent implements OnInit {
   buildForm() {
     this.form = this.fb.group({
       title: ['', Validators.required],
-      type: [null, Validators.required],
+      type: [LibraryItemType.Dvd],
       publicationDate: [null, Validators.required],
       publisher: [null, Validators.required],
       language: [null, Validators.required],
       duration: [null, Validators.required],
+      availability: [null, Validators.required],
     });
   }
 

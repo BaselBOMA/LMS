@@ -1,4 +1,5 @@
 import type { LibraryItemType } from './library-item-type.enum';
+import type { LibraryItemAvailability } from './library-item-availability.enum';
 import type { AuditedEntityDto } from '@abp/ng.core';
 
 export interface CreateUpdateLibraryItemDto {
@@ -6,6 +7,7 @@ export interface CreateUpdateLibraryItemDto {
   type: LibraryItemType;
   publicationDate: string;
   publisher: string;
+  availability: LibraryItemAvailability;
 }
 
 export interface LibraryItemDto extends AuditedEntityDto<string> {
@@ -13,6 +15,7 @@ export interface LibraryItemDto extends AuditedEntityDto<string> {
   type: LibraryItemType;
   publicationDate?: string;
   publisher?: string;
+  availability: LibraryItemAvailability;
 }
 
 export interface CreateUpdateBookDto extends CreateUpdateLibraryItemDto {

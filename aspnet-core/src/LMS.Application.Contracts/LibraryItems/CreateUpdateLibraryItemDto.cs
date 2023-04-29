@@ -19,4 +19,7 @@ public class CreateUpdateLibraryItemDto
     [Required]
     [StringLength(128)]
     public string Publisher { get; set; }
+
+    [Required]
+    public LibraryItemAvailability Availability { get; set; } 
 }

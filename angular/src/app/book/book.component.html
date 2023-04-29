@@ -63,6 +63,30 @@
               >
                 {{ '::Delete' | abpLocalization }}
               </button>
+              <button
+              ngbDropdownItem
+              (click)="checkOut(row.id)"
+            >
+              {{ '::CheckOut' | abpLocalization }}
+            </button>
+            <button
+              ngbDropdownItem
+              (click)="reserve(row.id)"
+            >
+              {{ '::Reserve' | abpLocalization }}
+            </button>
+            <button
+              ngbDropdownItem
+              (click)="notAvailable(row.id)"
+            >
+              {{ '::NotAvailable' | abpLocalization }}
+            </button>
+            <button
+              ngbDropdownItem
+              (click)="Available(row.id)"
+            >
+              {{ '::Available' | abpLocalization }}
+            </button>
             </div>
           </div>
         </ng-template>
@@ -86,6 +110,11 @@
       <ngx-datatable-column [name]="'::Author' | abpLocalization" prop="author">
       </ngx-datatable-column>
       <ngx-datatable-column [name]="'::Pages' | abpLocalization" prop="pages">
+      </ngx-datatable-column>
+      <ngx-datatable-column [name]="'::Availability' | abpLocalization" prop="availability">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{ '::Enum:LibraryItemAvailability.' + row.availability | abpLocalization }}
+        </ng-template>
       </ngx-datatable-column>
     </ngx-datatable>
   </div>
@@ -119,16 +148,6 @@
       </div>
 
       <div class="mt-2">
-        <label for="book-type">Type</label><span> * </span>
-        <select class="form-control" id="book-type" formControlName="type">
-          <option [ngValue]="null">Select an item type</option>
-          <option [ngValue]="type.value" *ngFor="let type of libraryItemTypes">
-            {{ '::Enum:LibraryItemType.' + type.value | abpLocalization }}
-          </option>
-        </select>
-      </div>
-
-      <div class="mt-2">
         <label>Publication Date</label><span> * </span>
         <input
           #datepicker="ngbDatepicker"
@@ -138,6 +157,19 @@
           ngbDatepicker
           (click)="datepicker.toggle()"
         />
+      </div>
+
+      <div class="mt-2">
+        <label for="book-availability">Availability</label><span> * </span>
+        <select class="form-control" id="book-availability" formControlName="availability">
+          <option [ngValue]="null">Availability Of The Book</option>
+          <option
+            [ngValue]="availability.value"
+            *ngFor="let availability of libraryItemAvailability"
+          >
+            {{ '::Enum:LibraryItemAvailability.' + availability.value | abpLocalization }}
+          </option>
+        </select>
       </div>
     </form>
   </ng-template>
