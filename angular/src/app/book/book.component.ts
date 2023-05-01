@@ -1,11 +1,16 @@
 import { ListService, PagedResultDto } from '@abp/ng.core';
 import { Component, OnInit } from '@angular/core';
-import { CreateUpdateBookDto, libraryItemTypeOptions } from '@proxy/library-items';
+import {
+  CreateUpdateBookDto,
+  LibraryItemAvailability,
+  libraryItemTypeOptions,
+} from '@proxy/library-items';
 import { libraryItemAvailabilityOptions } from '@proxy/library-items';
 import { BookService, BookDto } from '@proxy/books';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
+import { CreateCheckoutDto } from '../CreateCheckoutDto';
 
 @Component({
   selector: 'app-book',
@@ -43,6 +48,8 @@ export class BookComponent implements OnInit {
 
   isModalOpen = false;
 
+  isCheckOutModalOpen = false;
+
   constructor(
     public readonly list: ListService,
     private bookService: BookService,
@@ -57,6 +64,14 @@ export class BookComponent implements OnInit {
       this.book = response;
     });
   }
+
+  CheckOutBook = (id: string, input: CreateCheckoutDto) => {
+    this.bookService.get(id).subscribe(book => {
+      this.selectedBook = book;
+      this.buildCheckOutForm();
+      this.isCheckOutModalOpen = true;
+    });
+  };
 
   createBook() {
     this.selectedBook = {} as BookDto;
@@ -74,6 +89,7 @@ export class BookComponent implements OnInit {
         type: book.type,
         pages: book.pages,
         availability: 1,
+        notes: 'NA',
       };
       this.bookService.update(id, updatedBook).subscribe(() => {
         window.location.reload();
@@ -91,6 +107,7 @@ export class BookComponent implements OnInit {
         type: book.type,
         pages: book.pages,
         availability: 0,
+        notes: 'None',
       };
       this.bookService.update(id, updatedBook).subscribe(() => {
         window.location.reload();
@@ -117,13 +134,52 @@ export class BookComponent implements OnInit {
   buildForm() {
     this.form = this.fb.group({
       title: ['', Validators.required],
-      publicationDate: [null, Validators.required],
+      publicationDate: [
+        this.selectedBook.publicationDate ? new Date(this.selectedBook.publicationDate) : null,
+        Validators.required,
+      ],
       publisher: [null, Validators.required],
       author: [null, Validators.required],
       pages: [null, Validators.required],
       availability: [null, Validators.required],
+      notes: ['', Validators.required],
     });
   }
+
+  buildCheckOutForm() {
+    this.form = this.fb.group({
+      daysToCheckout: [null, [Validators.required, Validators.min(1)]],
+      customerName: [null, [Validators.required]],
+    });
+  }
+
+  submitForm = () => {
+    if (this.form.invalid) {
+      return;
+    }
+    const input = this.form.getRawValue() as CreateCheckoutDto;
+    const checkedOutBook = this.book.items.find(book => book.id === this.selectedBook.id);
+    if (checkedOutBook) {
+      checkedOutBook.availability = LibraryItemAvailability.CheckedOut;
+      checkedOutBook.notes = `This Book Is Checked Out By ${input.customerName} For ${input.daysToCheckout} Days`;
+      const updateInput: CreateUpdateBookDto = {
+        title: checkedOutBook.title,
+        author: checkedOutBook.author,
+        type: checkedOutBook.type,
+        notes: checkedOutBook.notes,
+        availability: checkedOutBook.availability,
+        publicationDate: checkedOutBook.publicationDate,
+        publisher: checkedOutBook.publisher,
+        pages: checkedOutBook.pages,
+      };
+      this.isCheckOutModalOpen = false;
+      const book = this.bookService.get(this.selectedBook.id).subscribe(book => {
+        this.bookService.update(this.selectedBook.id, updateInput).subscribe(() => {
+          window.location.reload();
+        });
+      });
+    }
+  };
 
   save() {
     if (this.form.invalid) {

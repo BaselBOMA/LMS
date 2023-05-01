@@ -17,7 +17,6 @@ import { APP_ROUTE_PROVIDER } from './route.provider';
 import { FeatureManagementModule } from '@abp/ng.feature-management';
 import { AbpOAuthModule } from '@abp/ng.oauth';
 import { TableFilterPipe } from '../app/item/table-filter.pipe';
-import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   imports: [
@@ -29,7 +28,6 @@ import { ToastrModule } from 'ngx-toastr';
       registerLocaleFn: registerLocale(),
     }),
     AbpOAuthModule.forRoot(),
-    ToastrModule.forRoot(),
     ThemeSharedModule.forRoot(),
     AccountConfigModule.forRoot(),
     IdentityConfigModule.forRoot(),
@@ -39,7 +37,7 @@ import { ToastrModule } from 'ngx-toastr';
     SideMenuLayoutModule.forRoot(),
     FeatureManagementModule.forRoot(),
   ],
-  declarations: [AppComponent, TableFilterPipe ],
+  declarations: [AppComponent, TableFilterPipe],
   providers: [APP_ROUTE_PROVIDER],
   bootstrap: [AppComponent],
 })

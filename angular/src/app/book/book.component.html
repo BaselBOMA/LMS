@@ -63,30 +63,18 @@
               >
                 {{ '::Delete' | abpLocalization }}
               </button>
-              <button
-              ngbDropdownItem
-              (click)="checkOut(row.id)"
-            >
-              {{ '::CheckOut' | abpLocalization }}
-            </button>
-            <button
-              ngbDropdownItem
-              (click)="reserve(row.id)"
-            >
-              {{ '::Reserve' | abpLocalization }}
-            </button>
-            <button
-              ngbDropdownItem
-              (click)="notAvailable(row.id)"
-            >
-              {{ '::NotAvailable' | abpLocalization }}
-            </button>
-            <button
-              ngbDropdownItem
-              (click)="Available(row.id)"
-            >
-              {{ '::Available' | abpLocalization }}
-            </button>
+              <button ngbDropdownItem (click)="CheckOutBook(row.id)">
+                {{ '::CheckOut' | abpLocalization }}
+              </button>
+              <button ngbDropdownItem (click)="reserve(row.id)">
+                {{ '::Reserve' | abpLocalization }}
+              </button>
+              <button ngbDropdownItem (click)="notAvailable(row.id)">
+                {{ '::NotAvailable' | abpLocalization }}
+              </button>
+              <button ngbDropdownItem (click)="Available(row.id)">
+                {{ '::Available' | abpLocalization }}
+              </button>
             </div>
           </div>
         </ng-template>
@@ -116,6 +104,10 @@
           {{ '::Enum:LibraryItemAvailability.' + row.availability | abpLocalization }}
         </ng-template>
       </ngx-datatable-column>
+      <ngx-datatable-column
+        [name]="'::Notes' | abpLocalization"
+        prop="notes"
+      ></ngx-datatable-column>
     </ngx-datatable>
   </div>
 </div>
@@ -171,6 +163,11 @@
           </option>
         </select>
       </div>
+
+      <div class="mt-2">
+        <label for="book-notes">Notes</label><span> * </span>
+        <input type="text" id="book-notes" class="form-control" formControlName="notes" />
+      </div>
     </form>
   </ng-template>
 
@@ -182,6 +179,37 @@
     <button class="btn btn-primary" (click)="save()" [disabled]="form.invalid">
       <i class="fa fa-check mr-1"></i>
       {{ '::Save' | abpLocalization }}
+    </button>
+  </ng-template>
+</abp-modal>
+
+<abp-modal [(visible)]="isCheckOutModalOpen">
+  <ng-template #abpHeader>
+    <h3>Checkout Library Item</h3>
+  </ng-template>
+
+  <ng-template #abpBody>
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
+      <div class="mt-2">
+        <label for="item-days">Days to Checkout</label><span> * </span>
+        <input type="number" id="item-days" class="form-control" formControlName="daysToCheckout" />
+      </div>
+
+      <div class="mt-2">
+        <label for="item-customer">Customer Name</label><span> * </span>
+        <input type="text" id="item-customer" class="form-control" formControlName="customerName" />
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #abpFooter>
+    <button type="button" class="btn btn-secondary" abpClose>
+      {{ '::Cancel' | abpLocalization }}
+    </button>
+
+    <button class="btn btn-primary" (click)="submitForm()" [disabled]="form.invalid">
+      <i class="fa fa-check mr-1"></i>
+      {{ '::CheckOut' | abpLocalization }}
     </button>
   </ng-template>
 </abp-modal>

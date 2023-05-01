@@ -8,6 +8,7 @@ export interface CreateUpdateLibraryItemDto {
   publicationDate: string;
   publisher: string;
   availability: LibraryItemAvailability;
+  notes: string;
 }
 
 export interface LibraryItemDto extends AuditedEntityDto<string> {
@@ -16,6 +17,7 @@ export interface LibraryItemDto extends AuditedEntityDto<string> {
   publicationDate?: string;
   publisher?: string;
   availability: LibraryItemAvailability;
+  notes?: string;
 }
 
 export interface CreateUpdateBookDto extends CreateUpdateLibraryItemDto {

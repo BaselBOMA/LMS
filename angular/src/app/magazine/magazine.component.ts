@@ -1,11 +1,17 @@
 import { ListService, PagedResultDto } from '@abp/ng.core';
 import { Component, OnInit } from '@angular/core';
 import { MagazineService, MagazineDto } from '@proxy/magazines';
-import { CreateUpdateMagazineDto, LibraryItemType, libraryItemTypeOptions } from '@proxy/library-items';
+import {
+  CreateUpdateMagazineDto,
+  LibraryItemAvailability,
+  LibraryItemType,
+  libraryItemTypeOptions,
+} from '@proxy/library-items';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 import { libraryItemAvailabilityOptions } from '@proxy/library-items';
+import { CreateCheckoutDto } from '../CreateCheckoutDto';
 
 @Component({
   selector: 'app-magazine',
@@ -42,6 +48,8 @@ export class MagazineComponent implements OnInit {
 
   isModalOpen = false;
 
+  isCheckOutModalOpen = false;
+
   constructor(
     public readonly list: ListService,
     private magazineService: MagazineService,
@@ -56,6 +64,14 @@ export class MagazineComponent implements OnInit {
       this.magazine = response;
     });
   }
+
+  CheckOutMagazine = (id: string, input: CreateCheckoutDto) => {
+    this.magazineService.get(id).subscribe(magazine => {
+      this.selectedMagazine = magazine;
+      this.buildCheckOutForm();
+      this.isCheckOutModalOpen = true;
+    });
+  };
 
   createMagazine() {
     this.selectedMagazine = {} as MagazineDto;
@@ -73,6 +89,7 @@ export class MagazineComponent implements OnInit {
         type: magazine.type,
         issueNumber: magazine.issueNumber,
         availability: 1,
+        notes: 'NA',
       };
       this.magazineService.update(id, updatedmagazine).subscribe(() => {
         window.location.reload();
@@ -90,6 +107,7 @@ export class MagazineComponent implements OnInit {
         type: magazine.type,
         issueNumber: magazine.issueNumber,
         availability: 0,
+        notes: 'None',
       };
       this.magazineService.update(id, updatedmagazine).subscribe(() => {
         window.location.reload();
@@ -122,8 +140,46 @@ export class MagazineComponent implements OnInit {
       issn: [null, Validators.required],
       issueNumber: [null, Validators.required],
       availability: [null, Validators.required],
+      notes: ['', Validators.required],
     });
   }
+
+  buildCheckOutForm() {
+    this.form = this.fb.group({
+      daysToCheckout: [null, [Validators.required, Validators.min(1)]],
+      customerName: [null, [Validators.required]],
+    });
+  }
+
+  submitForm = () => {
+    if (this.form.invalid) {
+      return;
+    }
+    const input = this.form.getRawValue() as CreateCheckoutDto;
+    const checkedOutmagazine = this.magazine.items.find(
+      magazine => magazine.id === this.selectedMagazine.id
+    );
+    if (checkedOutmagazine) {
+      checkedOutmagazine.availability = LibraryItemAvailability.CheckedOut;
+      checkedOutmagazine.notes = `This Magazine Is Checked Out By ${input.customerName} For ${input.daysToCheckout} Days`;
+      const updateInput: CreateUpdateMagazineDto = {
+        title: checkedOutmagazine.title,
+        issn: checkedOutmagazine.issn,
+        type: checkedOutmagazine.type,
+        notes: checkedOutmagazine.notes,
+        availability: checkedOutmagazine.availability,
+        publicationDate: checkedOutmagazine.publicationDate,
+        publisher: checkedOutmagazine.publisher,
+        issueNumber: checkedOutmagazine.issueNumber,
+      };
+      this.isCheckOutModalOpen = false;
+      const magazine = this.magazineService.get(this.selectedMagazine.id).subscribe(magazine => {
+        this.magazineService.update(this.selectedMagazine.id, updateInput).subscribe(() => {
+          window.location.reload();
+        });
+      });
+    }
+  };
 
   save() {
     if (this.form.invalid) {

@@ -47,6 +47,10 @@
           {{ '::Enum:LibraryItemAvailability.' + row.availability | abpLocalization }}
         </ng-template>
       </ngx-datatable-column>
+      <ngx-datatable-column
+      [name]="'::Notes' | abpLocalization"
+      prop="notes"
+    ></ngx-datatable-column>
     </ngx-datatable>
   </div>
 </div>

@@ -1,10 +1,17 @@
 import { ListService, PagedResultDto } from '@abp/ng.core';
 import { Component, OnInit } from '@angular/core';
 import { DvdService, DvdDto } from '@proxy/dvds';
-import { CreateUpdateDvdDto, LibraryItemType, libraryItemAvailabilityOptions, libraryItemTypeOptions } from '@proxy/library-items';
+import {
+  CreateUpdateDvdDto,
+  LibraryItemAvailability,
+  LibraryItemType,
+  libraryItemAvailabilityOptions,
+  libraryItemTypeOptions,
+} from '@proxy/library-items';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
+import { CreateCheckoutDto } from '../CreateCheckoutDto';
 
 @Component({
   selector: 'app-dvd',
@@ -41,6 +48,8 @@ export class DvdComponent implements OnInit {
 
   isModalOpen = false;
 
+  isCheckOutModalOpen = false;
+
   constructor(
     public readonly list: ListService,
     private dvdService: DvdService,
@@ -55,6 +64,14 @@ export class DvdComponent implements OnInit {
       this.dvd = response;
     });
   }
+
+  CheckOutDvd = (id: string, input: CreateCheckoutDto) => {
+    this.dvdService.get(id).subscribe(dvd => {
+      this.selectedDvd = dvd;
+      this.buildCheckOutForm();
+      this.isCheckOutModalOpen = true;
+    });
+  };
 
   createDvd() {
     this.selectedDvd = {} as DvdDto;
@@ -72,6 +89,7 @@ export class DvdComponent implements OnInit {
         type: dvd.type,
         language: dvd.language,
         availability: 1,
+        notes: 'NA',
       };
       this.dvdService.update(id, updateddvd).subscribe(() => {
         window.location.reload();
@@ -89,6 +107,7 @@ export class DvdComponent implements OnInit {
         type: dvd.type,
         language: dvd.language,
         availability: 0,
+        notes: 'None',
       };
       this.dvdService.update(id, updateddvd).subscribe(() => {
         window.location.reload();
@@ -121,8 +140,44 @@ export class DvdComponent implements OnInit {
       language: [null, Validators.required],
       duration: [null, Validators.required],
       availability: [null, Validators.required],
+      notes: ['', Validators.required],
     });
   }
+
+  buildCheckOutForm() {
+    this.form = this.fb.group({
+      daysToCheckout: [null, [Validators.required, Validators.min(1)]],
+      customerName: [null, [Validators.required]],
+    });
+  }
+
+  submitForm = () => {
+    if (this.form.invalid) {
+      return;
+    }
+    const input = this.form.getRawValue() as CreateCheckoutDto;
+    const checkedOutdvd = this.dvd.items.find(dvd => dvd.id === this.selectedDvd.id);
+    if (checkedOutdvd) {
+      checkedOutdvd.availability = LibraryItemAvailability.CheckedOut;
+      checkedOutdvd.notes = `This Dvd Is Checked Out By ${input.customerName} For ${input.daysToCheckout} Days`;
+      const updateInput: CreateUpdateDvdDto = {
+        title: checkedOutdvd.title,
+        language: checkedOutdvd.language,
+        type: checkedOutdvd.type,
+        notes: checkedOutdvd.notes,
+        availability: checkedOutdvd.availability,
+        publicationDate: checkedOutdvd.publicationDate,
+        publisher: checkedOutdvd.publisher,
+        duration: checkedOutdvd.duration,
+      };
+      this.isCheckOutModalOpen = false;
+      const dvd = this.dvdService.get(this.selectedDvd.id).subscribe(dvd => {
+        this.dvdService.update(this.selectedDvd.id, updateInput).subscribe(() => {
+          window.location.reload();
+        });
+      });
+    }
+  };
 
   save() {
     if (this.form.invalid) {

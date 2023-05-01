@@ -14,4 +14,6 @@ public class LibraryItem : AuditedAggregateRoot<Guid>
     public string Publisher { get; set; }
 
     public LibraryItemAvailability Availability { get; set; }
+
+    public string Notes { get; set; }
 }
