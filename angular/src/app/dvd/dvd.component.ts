@@ -12,6 +12,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 import { CreateCheckoutDto } from '../CreateCheckoutDto';
+import { CreateReserveDto } from '../CreateReserveDto';
 
 @Component({
   selector: 'app-dvd',
@@ -50,6 +51,8 @@ export class DvdComponent implements OnInit {
 
   isCheckOutModalOpen = false;
 
+  isReserveModalOpen = false;
+
   constructor(
     public readonly list: ListService,
     private dvdService: DvdService,
@@ -77,6 +80,14 @@ export class DvdComponent implements OnInit {
     this.selectedDvd = {} as DvdDto;
     this.buildForm();
     this.isModalOpen = true;
+  }
+
+  ReserveDvd(id: string, input: CreateReserveDto) {
+    this.dvdService.get(id).subscribe(dvd => {
+      this.selectedDvd = dvd;
+      this.buildReserveForm();
+      this.isReserveModalOpen = true;
+    });
   }
 
   notAvailable(id: string) {
@@ -151,6 +162,13 @@ export class DvdComponent implements OnInit {
     });
   }
 
+  buildReserveForm() {
+    this.form = this.fb.group({
+      reserver: [null, Validators.required],
+      reserverEmail: [null, [Validators.required, Validators.email]],
+    });
+  }
+
   submitForm = () => {
     if (this.form.invalid) {
       return;
@@ -178,6 +196,46 @@ export class DvdComponent implements OnInit {
       });
     }
   };
+
+  submitReserveForm() {
+    if (this.form.invalid) {
+      return;
+    }
+  
+    const input = this.form.getRawValue() as CreateReserveDto;
+  
+    const reservedDvd = this.dvd.items.find(dvd => dvd.id === this.selectedDvd.id);
+  
+    if (reservedDvd) {
+      const newNotes = `${reservedDvd.notes} The Dvd Is Reserved By ${input.reserver}`;
+  
+      if (reservedDvd.availability === LibraryItemAvailability.CheckedOut) {
+        reservedDvd.notes = newNotes;
+      } else {
+        reservedDvd.notes = `The Dvd Is Reserved By ${input.reserver}`;
+        reservedDvd.availability = LibraryItemAvailability.Reserved;
+      }
+  
+      const updateInput: CreateUpdateDvdDto = {
+        title: reservedDvd.title,
+        language: reservedDvd.language,
+        type: reservedDvd.type,
+        notes: reservedDvd.notes,
+        availability: reservedDvd.availability,
+        publicationDate: reservedDvd.publicationDate,
+        publisher: reservedDvd.publisher,
+        duration: reservedDvd.duration,
+      };
+  
+      this.isReserveModalOpen = false;
+  
+      const dvd = this.dvdService.get(this.selectedDvd.id).subscribe(dvd => {
+        this.dvdService.update(this.selectedDvd.id, updateInput).subscribe(() => {
+          window.location.reload();
+        });
+      });
+    }
+  }
 
   save() {
     if (this.form.invalid) {

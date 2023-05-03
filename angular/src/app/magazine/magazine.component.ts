@@ -12,6 +12,7 @@ import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 import { libraryItemAvailabilityOptions } from '@proxy/library-items';
 import { CreateCheckoutDto } from '../CreateCheckoutDto';
+import { CreateReserveDto } from '../CreateReserveDto';
 
 @Component({
   selector: 'app-magazine',
@@ -50,6 +51,8 @@ export class MagazineComponent implements OnInit {
 
   isCheckOutModalOpen = false;
 
+  isReserveModalOpen = false;
+
   constructor(
     public readonly list: ListService,
     private magazineService: MagazineService,
@@ -72,6 +75,14 @@ export class MagazineComponent implements OnInit {
       this.isCheckOutModalOpen = true;
     });
   };
+
+  ReserveMagazine(id: string, input: CreateReserveDto) {
+    this.magazineService.get(id).subscribe(magazine => {
+      this.selectedMagazine = magazine;
+      this.buildReserveForm();
+      this.isReserveModalOpen = true;
+    });
+  }
 
   createMagazine() {
     this.selectedMagazine = {} as MagazineDto;
@@ -151,6 +162,13 @@ export class MagazineComponent implements OnInit {
     });
   }
 
+  buildReserveForm() {
+    this.form = this.fb.group({
+      reserver: [null, Validators.required],
+      reserverEmail: [null, [Validators.required, Validators.email]],
+    });
+  }
+
   submitForm = () => {
     if (this.form.invalid) {
       return;
@@ -180,6 +198,46 @@ export class MagazineComponent implements OnInit {
       });
     }
   };
+
+  submitReserveForm() {
+    if (this.form.invalid) {
+      return;
+    }
+  
+    const input = this.form.getRawValue() as CreateReserveDto;
+  
+    const reservedMagazine = this.magazine.items.find(magazine => magazine.id === this.selectedMagazine.id);
+  
+    if (reservedMagazine) {
+      const newNotes = `${reservedMagazine.notes} The magazine Is Reserved By ${input.reserver}`;
+  
+      if (reservedMagazine.availability === LibraryItemAvailability.CheckedOut) {
+        reservedMagazine.notes = newNotes;
+      } else {
+        reservedMagazine.notes = `The Magazine Is Reserved By ${input.reserver}`;
+        reservedMagazine.availability = LibraryItemAvailability.Reserved;
+      }
+  
+      const updateInput: CreateUpdateMagazineDto = {
+        title: reservedMagazine.title,
+        issn: reservedMagazine.issn,
+        type: reservedMagazine.type,
+        notes: reservedMagazine.notes,
+        availability: reservedMagazine.availability,
+        publicationDate: reservedMagazine.publicationDate,
+        publisher: reservedMagazine.publisher,
+        issueNumber: reservedMagazine.issueNumber,
+      };
+  
+      this.isReserveModalOpen = false;
+  
+      const magazine = this.magazineService.get(this.selectedMagazine.id).subscribe(magazine => {
+        this.magazineService.update(this.selectedMagazine.id, updateInput).subscribe(() => {
+          window.location.reload();
+        });
+      });
+    }
+  }
 
   save() {
     if (this.form.invalid) {

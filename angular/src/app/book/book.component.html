@@ -66,7 +66,7 @@
               <button ngbDropdownItem (click)="CheckOutBook(row.id)">
                 {{ '::CheckOut' | abpLocalization }}
               </button>
-              <button ngbDropdownItem (click)="reserve(row.id)">
+              <button ngbDropdownItem (click)="ReserveBook(row.id)">
                 {{ '::Reserve' | abpLocalization }}
               </button>
               <button ngbDropdownItem (click)="notAvailable(row.id)">
@@ -210,6 +210,37 @@
     <button class="btn btn-primary" (click)="submitForm()" [disabled]="form.invalid">
       <i class="fa fa-check mr-1"></i>
       {{ '::CheckOut' | abpLocalization }}
+    </button>
+  </ng-template>
+</abp-modal>
+
+<abp-modal [(visible)]="isReserveModalOpen">
+  <ng-template #abpHeader>
+    <h3>Reserve Library Item</h3>
+  </ng-template>
+
+  <ng-template #abpBody>
+    <form [formGroup]="form" (ngSubmit)="submitReserveForm()">
+      <div class="mt-2">
+        <label for="item-name">Name</label><span> * </span>
+        <input type="text" id="item-name" class="form-control" formControlName="reserver" required />
+      </div>
+
+      <div class="mt-2">
+        <label for="item-email">Email</label><span> * </span>
+        <input type="email" id="item-email" class="form-control" formControlName="reserverEmail" required />
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #abpFooter>
+    <button type="button" class="btn btn-secondary" abpClose>
+      {{ '::Cancel' | abpLocalization }}
+    </button>
+
+    <button class="btn btn-primary" (click)="submitReserveForm()" [disabled]="form.invalid">
+      <i class="fa fa-check mr-1"></i>
+      {{ '::Reserve' | abpLocalization }}
     </button>
   </ng-template>
 </abp-modal>

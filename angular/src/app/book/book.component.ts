@@ -11,6 +11,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbDateNativeAdapter, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 import { CreateCheckoutDto } from '../CreateCheckoutDto';
+import { CreateReserveDto } from '../CreateReserveDto';
 
 @Component({
   selector: 'app-book',
@@ -50,6 +51,8 @@ export class BookComponent implements OnInit {
 
   isCheckOutModalOpen = false;
 
+  isReserveModalOpen = false;
+
   constructor(
     public readonly list: ListService,
     private bookService: BookService,
@@ -72,6 +75,14 @@ export class BookComponent implements OnInit {
       this.isCheckOutModalOpen = true;
     });
   };
+
+  ReserveBook(id: string, input: CreateReserveDto) {
+    this.bookService.get(id).subscribe(book => {
+      this.selectedBook = book;
+      this.buildReserveForm();
+      this.isReserveModalOpen = true;
+    });
+  }
 
   createBook() {
     this.selectedBook = {} as BookDto;
@@ -153,6 +164,13 @@ export class BookComponent implements OnInit {
     });
   }
 
+  buildReserveForm() {
+    this.form = this.fb.group({
+      reserver: [null, Validators.required],
+      reserverEmail: [null, [Validators.required, Validators.email]],
+    });
+  }
+
   submitForm = () => {
     if (this.form.invalid) {
       return;
@@ -180,6 +198,47 @@ export class BookComponent implements OnInit {
       });
     }
   };
+
+  submitReserveForm() {
+    if (this.form.invalid) {
+      return;
+    }
+  
+    const input = this.form.getRawValue() as CreateReserveDto;
+  
+    const reservedBook = this.book.items.find(book => book.id === this.selectedBook.id);
+  
+    if (reservedBook) {
+      const newNotes = `${reservedBook.notes} The Book Is Reserved By ${input.reserver}`;
+  
+      if (reservedBook.availability === LibraryItemAvailability.CheckedOut) {
+        reservedBook.notes = newNotes;
+      } else {
+        reservedBook.notes = `The Book Is Reserved By ${input.reserver}`;
+        reservedBook.availability = LibraryItemAvailability.Reserved;
+      }
+  
+      const updateInput: CreateUpdateBookDto = {
+        title: reservedBook.title,
+        author: reservedBook.author,
+        type: reservedBook.type,
+        notes: reservedBook.notes,
+        availability: reservedBook.availability,
+        publicationDate: reservedBook.publicationDate,
+        publisher: reservedBook.publisher,
+        pages: reservedBook.pages,
+      };
+  
+      this.isReserveModalOpen = false;
+  
+      const book = this.bookService.get(this.selectedBook.id).subscribe(book => {
+        this.bookService.update(this.selectedBook.id, updateInput).subscribe(() => {
+          window.location.reload();
+        });
+      });
+    }
+  }
+  
 
   save() {
     if (this.form.invalid) {
