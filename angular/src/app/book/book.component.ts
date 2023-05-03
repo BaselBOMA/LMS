@@ -209,12 +209,13 @@ export class BookComponent implements OnInit {
     const reservedBook = this.book.items.find(book => book.id === this.selectedBook.id);
   
     if (reservedBook) {
-      const newNotes = `${reservedBook.notes} The Book Is Reserved By ${input.reserver}`;
+      const newNotes = `${reservedBook.notes}<br>The Book Is Reserved By ${input.reserver}`;
   
       if (reservedBook.availability === LibraryItemAvailability.CheckedOut) {
         reservedBook.notes = newNotes;
+        reservedBook.availability = LibraryItemAvailability.Reserved;
       } else {
-        reservedBook.notes = `The Book Is Reserved By ${input.reserver}`;
+        reservedBook.notes = `This Book Is Reserved By ${input.reserver}`;
         reservedBook.availability = LibraryItemAvailability.Reserved;
       }
   

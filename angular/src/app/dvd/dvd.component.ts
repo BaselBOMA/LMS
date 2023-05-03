@@ -201,21 +201,21 @@ export class DvdComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-  
+
     const input = this.form.getRawValue() as CreateReserveDto;
-  
+
     const reservedDvd = this.dvd.items.find(dvd => dvd.id === this.selectedDvd.id);
-  
+
     if (reservedDvd) {
-      const newNotes = `${reservedDvd.notes} The Dvd Is Reserved By ${input.reserver}`;
-  
+      const newNotes = `${reservedDvd.notes}<br>This Dvd Is Reserved By ${input.reserver}`;
       if (reservedDvd.availability === LibraryItemAvailability.CheckedOut) {
         reservedDvd.notes = newNotes;
+        reservedDvd.availability = LibraryItemAvailability.Reserved;
       } else {
-        reservedDvd.notes = `The Dvd Is Reserved By ${input.reserver}`;
+        reservedDvd.notes = `This Dvd Is Reserved By ${input.reserver}`;
         reservedDvd.availability = LibraryItemAvailability.Reserved;
       }
-  
+
       const updateInput: CreateUpdateDvdDto = {
         title: reservedDvd.title,
         language: reservedDvd.language,
@@ -226,9 +226,9 @@ export class DvdComponent implements OnInit {
         publisher: reservedDvd.publisher,
         duration: reservedDvd.duration,
       };
-  
+
       this.isReserveModalOpen = false;
-  
+
       const dvd = this.dvdService.get(this.selectedDvd.id).subscribe(dvd => {
         this.dvdService.update(this.selectedDvd.id, updateInput).subscribe(() => {
           window.location.reload();

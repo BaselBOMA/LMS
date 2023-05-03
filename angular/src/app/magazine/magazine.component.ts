@@ -203,21 +203,23 @@ export class MagazineComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-  
+
     const input = this.form.getRawValue() as CreateReserveDto;
-  
-    const reservedMagazine = this.magazine.items.find(magazine => magazine.id === this.selectedMagazine.id);
-  
+
+    const reservedMagazine = this.magazine.items.find(
+      magazine => magazine.id === this.selectedMagazine.id
+    );
+
     if (reservedMagazine) {
-      const newNotes = `${reservedMagazine.notes} The magazine Is Reserved By ${input.reserver}`;
-  
+      const newNotes = `${reservedMagazine.notes}<br>This Magazine Is Reserved By ${input.reserver}`;
       if (reservedMagazine.availability === LibraryItemAvailability.CheckedOut) {
         reservedMagazine.notes = newNotes;
+        reservedMagazine.availability = LibraryItemAvailability.Reserved;
       } else {
-        reservedMagazine.notes = `The Magazine Is Reserved By ${input.reserver}`;
+        reservedMagazine.notes = `This Magazine Is Reserved By ${input.reserver}`;
         reservedMagazine.availability = LibraryItemAvailability.Reserved;
       }
-  
+
       const updateInput: CreateUpdateMagazineDto = {
         title: reservedMagazine.title,
         issn: reservedMagazine.issn,
@@ -228,9 +230,9 @@ export class MagazineComponent implements OnInit {
         publisher: reservedMagazine.publisher,
         issueNumber: reservedMagazine.issueNumber,
       };
-  
+
       this.isReserveModalOpen = false;
-  
+
       const magazine = this.magazineService.get(this.selectedMagazine.id).subscribe(magazine => {
         this.magazineService.update(this.selectedMagazine.id, updateInput).subscribe(() => {
           window.location.reload();
