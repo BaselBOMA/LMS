@@ -199,6 +199,10 @@ export class MagazineComponent implements OnInit {
     }
   };
 
+  isReserveButtonDisabled(row: any): boolean {
+    return row.availability !== LibraryItemAvailability.CheckedOut;
+  }
+
   submitReserveForm() {
     if (this.form.invalid) {
       return;

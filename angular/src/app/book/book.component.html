@@ -66,7 +66,7 @@
               <button ngbDropdownItem (click)="CheckOutBook(row.id)">
                 {{ '::CheckOut' | abpLocalization }}
               </button>
-              <button ngbDropdownItem (click)="ReserveBook(row.id)">
+              <button ngbDropdownItem (click)="ReserveBook(row.id)" [disabled]="isReserveButtonDisabled(row)">
                 {{ '::Reserve' | abpLocalization }}
               </button>
               <button ngbDropdownItem (click)="notAvailable(row.id)">
